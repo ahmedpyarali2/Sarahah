@@ -4,6 +4,9 @@ from flask import jsonify
 
 from sarahah import app
 from sarahah.authentications import expects
+from sarahah.users import create
+from sarahah.errors import InvalidUsage
+from sarahah.utils import posted
 
 
 # --- main views
@@ -18,12 +21,18 @@ def hello_world():
 def register(data):
     """ registers a user by adding there record to database """
 
-    user = {
-        'token' : '{0}'.format(uuid.uuid4()),
-        'id' : '{0}'.format(uuid.uuid4())
-    }
+    params = posted()
+    username = params['username']
+    password = params['password']
 
-    return jsonify(user)
+    uid = create(username, password)
+
+    if not uid:
+        raise InvalidUsage(message='Exception while creating user.', status_code=453)
+
+    return jsonify(user_id=uid)
+
+
 
 
     
