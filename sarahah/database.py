@@ -35,16 +35,20 @@ def db_read(query, values=None):
             else:
                 cursor.execute(query)
 
-            results = cursor.fetchone()
+            results = cursor.fetchall()
 
         connection.close()
 
-    return results
+    if len(results) > 1:
+        return results
+
+    else:
+        return results[0]
 
 
 
 
-def db_insert(query, values):
+def db_insert(query, values=None):
     """ Performs the insert query on the database """
 
     # any excepton accoured

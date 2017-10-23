@@ -5,7 +5,7 @@ import uuid
 from flask import jsonify
 
 from sarahah import app
-from sarahah.database import db_insert
+from sarahah.database import db_read, db_insert
 
 
 def create(username, password):
@@ -21,3 +21,21 @@ def create(username, password):
         return None
 
     return uid
+
+def user_by_username(username):
+    """ Get the user from username """
+
+    sql = 'SELECT * from `user` WHERE `username`=%s'
+    
+    return db_read(sql, (username))
+
+
+def get_user_session(user):
+
+    token = '{0}'.format(uuid.uuid4())
+    sql = 'UPDATE `user` SET `token` = %s WHERE `user_id` = %s'
+    exception = db_insert(sql, (token, user['user_id']))
+
+    if exception:
+        return None
+    return token
