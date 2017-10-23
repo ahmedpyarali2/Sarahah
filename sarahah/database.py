@@ -49,7 +49,7 @@ def db_read(query, values=None):
 
 
 def db_insert(query, values=None):
-    """ Performs the insert query on the database """
+    """ Performs the insert and update query on the database """
 
     # any excepton accoured
     exception = False
