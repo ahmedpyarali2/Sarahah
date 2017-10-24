@@ -5,6 +5,7 @@ import uuid
 from flask import jsonify
 
 from sarahah import app
+from sarahah.utils import get_token
 from sarahah.database import db_read, db_insert
 
 
@@ -39,3 +40,27 @@ def get_user_session(user):
     if exception:
         return None
     return token
+
+
+def current():
+    """ Gets the currently logged in user """
+    token = get_token()
+    if token:
+        sql = 'SELECT * FROM `user` WHERE `token` = %s'
+        user = db_read(sql, (token))
+        return user
+
+    return None
+
+
+def fetch_my_messages(user_id, inbox=True):
+    """ Gets all the message for users """
+
+
+    if inbox:
+        sql = 'SELECT * FROM `message` WHERE `to_id` = %s'
+    else:
+        sql = 'SELECT * FROM `message` WHERE `from_id` = %s'
+    
+    messages = db_read(sql, (user_id))
+    return messages

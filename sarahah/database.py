@@ -39,11 +39,13 @@ def db_read(query, values=None):
 
         connection.close()
 
+    if len(results) == 0:
+        return None
+
     if len(results) > 1:
         return results
 
-    else:
-        return results[0]
+    return results[0]
 
 
 
