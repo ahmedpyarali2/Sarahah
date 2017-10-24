@@ -17,9 +17,9 @@ def activate_venv():
 
     # check if we can activate the virtual environment at standard location.
     if not os.path.isfile(path):
-        print '[ERROR] Seems like you have not activated your virtual environment.'
-        print '[ERROR] I tried to load from the standard location, but was not able to find it.'
-        print 'Please create a virtual environment at: {0}'.format('{0}/venv'.format(this))
+        print('[ERROR] Seems like you have not activated your virtual environment.')
+        print('[ERROR] I tried to load from the standard location, but was not able to find it.')
+        print('Please create a virtual environment at: {0}'.format('{0}/venv'.format(this)))
         sys.exit(1)
 
     # activate the virtual environment.
