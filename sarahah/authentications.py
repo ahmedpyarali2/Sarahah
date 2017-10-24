@@ -3,7 +3,8 @@ from functools import wraps
 
 from sarahah import app
 from sarahah.errors import InvalidUsage
-from sarahah.utils import posted
+from sarahah.utils import posted, get_token
+from sarahah.users import current
 
 
 def expects(parameters):
@@ -30,7 +31,7 @@ def expects(parameters):
 
             # check if all expected paramters are recived or not
             if set(received_params.keys()) != set(parameters):
-                raise InvalidUsage(message='Missing paramters: ' + ''.join(list(set(parameters) - set(received_params.keys()))))
+                raise InvalidUsage(message='Missing paramters: ' + ''.join(list(set(parameters) - set(received_params.keys()))), status_code=453)
 
             # return paramters back to the view function
             return view_function(received_params, *args, **kwargs)
@@ -39,3 +40,19 @@ def expects(parameters):
         return wrapper
 
     return decorator
+
+
+def authenticate(view_function):
+    """ Check if user is logged in or not """
+
+    @wraps(view_function)
+    def wrapper(*args, **kwargs):
+        request_token = get_token()
+        user = current()
+
+        if request_token != user['token']:
+            raise InvalidUsage(message='Expired token', status_code=453)
+
+        return view_function(*args, **kwargs)
+
+    return wrapper

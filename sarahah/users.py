@@ -5,6 +5,7 @@ import uuid
 from flask import jsonify
 
 from sarahah import app
+from sarahah.utils import get_token
 from sarahah.database import db_read, db_insert
 
 
@@ -30,6 +31,13 @@ def user_by_username(username):
     return db_read(sql, (username))
 
 
+def user_by_id(user_id):
+    """ Gets the user form user id """
+    sql = 'SELECT * from `user` WHERE `user_id`=%s'
+    
+    return db_read(sql, (user_id))
+
+
 def get_user_session(user):
 
     token = '{0}'.format(uuid.uuid4())
@@ -39,3 +47,36 @@ def get_user_session(user):
     if exception:
         return None
     return token
+
+
+def current():
+    """ Gets the currently logged in user """
+    token = get_token()
+    if token:
+        sql = 'SELECT * FROM `user` WHERE `token` = %s'
+        user = db_read(sql, (token))
+        return user
+
+    return None
+
+
+def fetch_my_messages(user_id, inbox=True):
+    """ Gets all the message for users """
+
+
+    if inbox:
+        sql = 'SELECT * FROM `message` WHERE `to_id` = %s'
+    else:
+        sql = 'SELECT * FROM `message` WHERE `from_id` = %s'
+    
+    messages = db_read(sql, (user_id))
+    return messages
+
+
+def send_anonymous(to, frm, message):
+    """ Sends an anonymous message to a user """
+
+    if not message:
+        message = ''
+    sql = 'INSERT INTO `message` (`m_id`, `to_id`, `from_id`, `message`) VALUES (%s, %s, %s, %s)'
+    return db_insert(sql, ('{0}'.format(uuid.uuid4()), to, frm, message))
