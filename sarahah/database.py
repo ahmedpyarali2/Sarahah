@@ -39,11 +39,13 @@ def db_read(query, values=None):
 
         connection.close()
 
+    if len(results) == 0:
+        return None
+
     if len(results) > 1:
         return results
 
-    else:
-        return results[0]
+    return results[0]
 
 
 
@@ -68,10 +70,11 @@ def db_insert(query, values=None):
             # commit the changes to database
             connection.commit()
 
-        except:
+        except pymysql.InternalError as error:
 
             # some exception happened.
             exception = True
+            print(error.args[1])
 
         # close the connection to db adn return
         connection.close()
