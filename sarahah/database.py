@@ -70,10 +70,11 @@ def db_insert(query, values=None):
             # commit the changes to database
             connection.commit()
 
-        except:
+        except pymysql.InternalError as error:
 
             # some exception happened.
             exception = True
+            print(error.args[1])
 
         # close the connection to db adn return
         connection.close()

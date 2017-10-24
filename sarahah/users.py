@@ -31,6 +31,13 @@ def user_by_username(username):
     return db_read(sql, (username))
 
 
+def user_by_id(user_id):
+    """ Gets the user form user id """
+    sql = 'SELECT * from `user` WHERE `user_id`=%s'
+    
+    return db_read(sql, (user_id))
+
+
 def get_user_session(user):
 
     token = '{0}'.format(uuid.uuid4())
@@ -64,3 +71,12 @@ def fetch_my_messages(user_id, inbox=True):
     
     messages = db_read(sql, (user_id))
     return messages
+
+
+def send_anonymous(to, frm, message):
+    """ Sends an anonymous message to a user """
+
+    if not message:
+        message = ''
+    sql = 'INSERT INTO `message` (`m_id`, `to_id`, `from_id`, `message`) VALUES (%s, %s, %s, %s)'
+    return db_insert(sql, ('{0}'.format(uuid.uuid4()), to, frm, message))

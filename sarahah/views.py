@@ -5,6 +5,7 @@ from flask import jsonify
 from sarahah import app
 from sarahah.authentications import expects, authenticate
 from sarahah.users import create, user_by_username, get_user_session, current, fetch_my_messages
+from sarahah.users import send_anonymous, user_by_id
 from sarahah.errors import InvalidUsage
 from sarahah.utils import posted
 
@@ -57,7 +58,7 @@ def login(data):
 @app.route('/me/inbox', methods=['GET'])
 @authenticate
 def my_inbox():
-    """ fetches the messages for currently logged in user """
+    """ fetches inbox messages for currently logged in user """
     user = current()
 
     if not user:
@@ -75,7 +76,7 @@ def my_inbox():
 @app.route('/me/outbox', methods=['GET'])
 @authenticate
 def my_outbox():
-    """ fetches the messages for currently logged in user """
+    """ fetches outbox messages for currently logged in user """
     user = current()
 
     if not user:
@@ -88,6 +89,27 @@ def my_outbox():
         messages = []
 
     return jsonify(messsages=messages)
+
+
+@app.route('/message', methods=['POST'])
+@expects(['to_id', 'message'])
+@authenticate
+def send(data):
+    """ Send an anonymous message to a user """
+    sender = current()
+    receiver = user_by_id(data['to_id'])
+
+    if not sender:
+        raise InvalidUsage(messages='Invalid user.', status_code=453)
+
+    if not receiver:
+        raise InvalidUsage(messages='This user is not registered yet.', status_code=453)
+
+
+    if not send_anonymous(receiver['user_id'], sender['user_id'], data['message']):
+        return jsonify(status='OK')
+
+    raise InvalidUsage(message='Error while writing message', status_code=453)
 
 
 
